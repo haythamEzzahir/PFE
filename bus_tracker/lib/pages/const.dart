@@ -5,7 +5,7 @@ class AppColors {
 }
 
 class TitleBar extends StatelessWidget implements PreferredSizeWidget {
-  const TitleBar({Key? key}) : super(key: key);
+  const TitleBar({super.key});
 
   @override
   Widget build(BuildContext context) {
