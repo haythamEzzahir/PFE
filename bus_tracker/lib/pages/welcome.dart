@@ -1,6 +1,6 @@
 import 'package:bus_tracker/pages/constants.dart';
-import 'package:bus_tracker/pages/creatAccount.dart';
 import 'package:bus_tracker/pages/login.dart';
+import 'package:bus_tracker/pages/creatAccount.dart';
 import 'package:flutter/material.dart';
 // Import the next page
 
@@ -45,7 +45,7 @@ class Welcome extends StatelessWidget {
                     width: 146,
                     height: 146,
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(255, 223, 0, 1),
+                      color: const Color.fromRGBO(255, 223, 0, 1),
                       borderRadius: BorderRadius.circular(17),
                     ),
                     child: Image.asset(

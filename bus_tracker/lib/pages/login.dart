@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/constants.dart';
+import 'package:bus_tracker/pages/virefy.dart';
 
 final _formKey = GlobalKey<FormState>();
 
@@ -62,6 +63,12 @@ class Login extends StatelessWidget {
                    ),
                      ElevatedButton(
                 onPressed: () {
+                  Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const EmailVerificationPage()),
+                      );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: yellowBar,
