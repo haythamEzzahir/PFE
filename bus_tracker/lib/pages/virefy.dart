@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'const.dart';
+import 'constants.dart';
 import 'package:bus_tracker/pages/view_buses.dart';
 
 class EmailVerificationPage extends StatefulWidget {
@@ -30,7 +30,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const TitleBar(),
+      appBar: const CustomAppBar(title: 'TRIPS'),
       body: _buildBody(context),
     );
   }
@@ -135,7 +135,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.yellow,
+              backgroundColor: yellowColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(13),
               ),

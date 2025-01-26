@@ -71,7 +71,7 @@ class Login extends StatelessWidget {
                       );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: yellowBar,
+                  backgroundColor: yellowColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(17),
                   ),

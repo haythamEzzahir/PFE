@@ -1,5 +1,6 @@
+import 'package:bus_tracker/pages/constants.dart';
 import 'package:flutter/material.dart';
-import 'const.dart';
+
 
 class BusListPage extends StatelessWidget {
   const BusListPage({super.key});
@@ -8,7 +9,7 @@ class BusListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.yellow,
+        backgroundColor: yellowColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black), // Arrow icon
           onPressed: () {
@@ -138,7 +139,7 @@ class BusListPage extends StatelessWidget {
                     // Navigate to the route creation screen
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.yellow,
+                    backgroundColor: yellowColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

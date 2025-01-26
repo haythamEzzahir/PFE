@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // COLORS :
-const Color yellowBar = Color.fromRGBO(255, 223, 0, 1); // Replace with your actual color
+const Color yellowColor = Color.fromRGBO(255, 223, 0, 1); // Replace with your actual color
 
 
 // FONTS :
@@ -26,7 +26,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     Key? key,
     required this.title,
     this.onBackPressed,
-    this.backgroundColor = yellowBar,
+    this.backgroundColor = yellowColor,
     this.titleTextStyle,
   }) : super(key: key);
 
@@ -70,7 +70,7 @@ Widget BackgroundWidget({List<Widget> children = const []}) {
               width: 146,
               height: 146,
               decoration: BoxDecoration(
-                color: yellowBar,
+                color: yellowColor,
                 borderRadius: BorderRadius.circular(17),
               ),
               child: Padding(
@@ -106,7 +106,7 @@ class CustomBottomBar extends StatelessWidget {
       child: Container(
         height: 68,
         width: double.infinity,
-        color: yellowBar, // Customize the color if needed
+        color: yellowColor, // Customize the color if needed
         alignment: Alignment.center,
         child: Text(
           text,

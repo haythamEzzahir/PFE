@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bus_tracker/pages/welcome.dart'; // Import the Welcome page
+import 'package:bus_tracker/pages/welcome.dart'; 
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'const.dart';
+import 'constants.dart';
 import 'package:bus_tracker/pages/list_buses.dart';
 
 class ViewBuses extends StatelessWidget {
@@ -30,7 +30,7 @@ class ViewBuses extends StatelessWidget {
                       );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.yellow,
+                backgroundColor: yellowColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(13),
                 ),
@@ -66,7 +66,7 @@ class ViewBuses extends StatelessWidget {
                         );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.yellow,
+                backgroundColor: yellowColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(13),
                 ),
