@@ -2,9 +2,29 @@
 
 import 'package:flutter/material.dart';
 import 'const.dart';
+import 'package:bus_tracker/pages/view_buses.dart';
 
-class EmailVerificationPage extends StatelessWidget {
+class EmailVerificationPage extends StatefulWidget {
   const EmailVerificationPage({super.key});
+
+  @override
+  _EmailVerificationPageState createState() => _EmailVerificationPageState();
+}
+
+class _EmailVerificationPageState extends State<EmailVerificationPage> {
+  final List<TextEditingController> controllers = List.generate(
+    4,
+    (index) => TextEditingController(),
+  );
+
+  // Error message visibility
+  String? errorMessage;
+
+  bool isValidCode() {
+    // Check if all the entered values are digits and the length is 4
+    String code = controllers.map((c) => c.text).join();
+    return code.length == 4 && code.contains(RegExp(r'^\d+$'));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +36,6 @@ class EmailVerificationPage extends StatelessWidget {
   }
 
   Padding _buildBody(BuildContext context) {
-    final List<TextEditingController> controllers = List.generate(
-      4,
-      (index) => TextEditingController(),
-    );
-
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -89,19 +104,42 @@ class EmailVerificationPage extends StatelessWidget {
             }),
           ),
 
+          // Error message (if any)
+          if (errorMessage != null)
+            Text(
+              errorMessage!,
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
           ElevatedButton(
             onPressed: () {
-              // Combine all inputs
               String code = controllers.map((c) => c.text).join();
-              print("Verification code: $code");
+
+              if (!isValidCode()) {
+                setState(() {
+                  errorMessage = "Please enter a valid 4-digit code.";
+                });
+              } else {
+                setState(() {
+                  errorMessage = null; // Clear error if valid
+                });
+                print("Verification code: $code");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ViewBuses()),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.yellow,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(13),
               ),
-              padding:
-                  const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
             ),
             child: const Text(
               "CONFIRM",
