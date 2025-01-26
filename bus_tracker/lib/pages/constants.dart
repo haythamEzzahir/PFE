@@ -126,12 +126,13 @@ class CustomBottomBar extends StatelessWidget {
 
 
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final String labelText;
   final bool isPassword;
   final TextEditingController? controller;
   final TextStyle? labelStyle;
   final TextInputType keyboardType;
+  final String? Function(String?)? validator;
 
   const CustomTextField({
     Key? key,
@@ -140,36 +141,47 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     this.labelStyle,
     this.keyboardType = TextInputType.text,
+    this.validator,
   }) : super(key: key);
 
   @override
+  _CustomTextFieldState createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+  String? _errorText;
+
+  void validateInput(String value) {
+    if (widget.validator != null) {
+      setState(() {
+        _errorText = widget.validator!(value);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey, // Line color
-            width: 1.0,         // Line thickness
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: widget.controller,
+          obscureText: widget.isPassword,
+          keyboardType: widget.keyboardType,
+          onChanged: validateInput,
+          decoration: InputDecoration(
+            labelText: widget.labelText,
+            labelStyle: widget.labelStyle ??
+                const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
+            border: const UnderlineInputBorder(),
+            contentPadding: const EdgeInsets.only(bottom: 5.0),
+            errorText: _errorText, // Dynamically displays the error message
           ),
         ),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: isPassword, // Hides the text if true
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: labelStyle ??
-              TextStyle(
-                color: Colors.grey,
-                fontSize: 16,
-              ),
-          border: InputBorder.none, // Removes default border
-          contentPadding: EdgeInsets.only(bottom: 5.0),
-        ),
-        
-      ),
-       
+      ],
     );
   }
 }

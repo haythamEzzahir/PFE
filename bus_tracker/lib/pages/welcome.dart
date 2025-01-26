@@ -73,16 +73,19 @@ class Welcome extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const Creataccount()),
+                              builder: (context) => Creataccount()),
                         );
                       },
-                      child: const Text("Create Account",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            decoration: TextDecoration.underline,
-                          ))),
+                      child: const Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Text("Create Account",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              decoration: TextDecoration.underline,
+                            )),
+                      )),
                 ],
               ),
             ),
@@ -94,7 +97,7 @@ class Welcome extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const Login()),
+            MaterialPageRoute(builder: (context) =>  LoginPage()),
           );
         },
       ),

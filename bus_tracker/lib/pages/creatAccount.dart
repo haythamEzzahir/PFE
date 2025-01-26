@@ -1,11 +1,17 @@
+import 'package:bus_tracker/pages/virefy.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/constants.dart';
-import 'package:bus_tracker/pages/virefy.dart';
 
 final _formKey = GlobalKey<FormState>();
 
 class Creataccount extends StatelessWidget {
-  const Creataccount({super.key});
+  Creataccount({super.key});
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =TextEditingController();
+  final TextEditingController _mobileController =TextEditingController();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -32,36 +38,80 @@ class Creataccount extends StatelessWidget {
                   const SizedBox(
                     height: 50,
                   ),
-                  const CustomTextField(
+                  CustomTextField(
                     labelText: 'Email',
+                    keyboardType: TextInputType.emailAddress,
+                    controller: _emailController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email cannot be empty';
+                      }
+                      final emailRegex = RegExp(
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                      if (!emailRegex.hasMatch(value)) {
+                        return 'Invalid email address';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 50),
-                  const CustomTextField(
+                  CustomTextField(
                     labelText: 'Password',
                     isPassword: true,
-                    // controller: passwordController,
+                    controller: _passwordController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Password cannot be empty';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters long';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 50),
-                  const CustomTextField(
+                  CustomTextField(
                     labelText: 'Re-enter Password',
                     isPassword: true,
+                    controller: _confirmPasswordController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please confirm your password';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 50),
-                  const CustomTextField(
+                  CustomTextField(
                     labelText: 'Mobile #',
                     isPassword: false,
+                    keyboardType: TextInputType.number,
+                    controller: _mobileController,
                   ),
                   const SizedBox(
                     height: 90,
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
+                      if (_emailController.text.isEmpty ||
+                          _passwordController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please fill in all fields')),
+                        );
+                      } else {
+                        print('Email: ${_emailController.text}');
+                        print('Password: ${_passwordController.text}');
+                        Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
                                 const EmailVerificationPage()),
                       );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: yellowColor,
