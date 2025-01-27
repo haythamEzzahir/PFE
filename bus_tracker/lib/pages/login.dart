@@ -11,11 +11,11 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
- 
+
   @override
   Widget build(BuildContext context) {
-   
     return SafeArea(
       child: Scaffold(
         appBar: const CustomAppBar(
@@ -37,7 +37,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 50),
-                  
                   CustomTextField(
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
@@ -53,14 +52,12 @@ class _LoginPageState extends State<LoginPage> {
                       }
                       return null;
                     },
-                    
                   ),
                   const SizedBox(height: 50),
                   CustomTextField(
                     labelText: 'Password',
                     isPassword: true,
                     controller: _passwordController,
-                    
                   ),
                   const SizedBox(height: 100),
                   Image.asset(
@@ -77,22 +74,33 @@ class _LoginPageState extends State<LoginPage> {
                           vertical: 10, horizontal: 110),
                     ),
                     onPressed: () {
-                // Handle form submission
-                 if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please fill in all fields')),
-                  );
-                } else {
-                  print('Email: ${_emailController.text}');
-                  print('Password: ${_passwordController.text}');
-                  Navigator.push(
+                      // Validate form fields
+                      if (_emailController.text.isEmpty ||
+                          _passwordController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please fill in all fields')),
+                        );
+                        return;
+                      }
+
+                      // Validate email format
+                     
+                      if (!emailRegex.hasMatch(_emailController.text)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Invalid email address')),
+                        );
+                        return;
+                      }
+
+                      // If all validations pass, navigate to the next page
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                const ViewBuses()),
+                            builder: (context) => const ViewBuses()),
                       );
-                }
-              },
+                    },
                     child: const Text(
                       "SIGN IN",
                       style: boldTextStyle,

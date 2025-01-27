@@ -67,7 +67,7 @@ class Welcome extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 180),
+                  const SizedBox(height: 160),
                   TextButton(
                       onPressed: () {
                         Navigator.push(
@@ -76,16 +76,15 @@ class Welcome extends StatelessWidget {
                               builder: (context) => Creataccount()),
                         );
                       },
-                      child: const Padding(
-                        padding: EdgeInsets.all(20.0),
-                        child: Text("Create Account",
+                    
+                        child: const Text("Create Account",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                               decoration: TextDecoration.underline,
                             )),
-                      )),
+                      ),
                 ],
               ),
             ),

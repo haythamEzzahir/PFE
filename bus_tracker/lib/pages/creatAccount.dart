@@ -11,7 +11,8 @@ class Creataccount extends StatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =TextEditingController();
   final TextEditingController _mobileController =TextEditingController();
-  
+  final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                          
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +47,7 @@ class Creataccount extends StatelessWidget {
                       if (value == null || value.isEmpty) {
                         return 'Email cannot be empty';
                       }
-                      final emailRegex = RegExp(
-                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                     
                       if (!emailRegex.hasMatch(value)) {
                         return 'Invalid email address';
                       }
@@ -95,24 +95,38 @@ class Creataccount extends StatelessWidget {
                     height: 90,
                   ),
                   ElevatedButton(
-                    onPressed: () {
+                     onPressed: () {
+                      // Validate form fields
                       if (_emailController.text.isEmpty ||
-                          _passwordController.text.isEmpty) {
+                          _passwordController.text.isEmpty ||  _confirmPasswordController.text.isEmpty || _mobileController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text('Please fill in all fields')),
                         );
-                      } else {
-                        print('Email: ${_emailController.text}');
-                        print('Password: ${_passwordController.text}');
-                        Navigator.push(
+                        return;
+                      }
+
+                      // Validate email format
+                     
+                      if (!emailRegex.hasMatch(_emailController.text)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Invalid email address')),
+                        );
+                        return;
+
+                      }else if (_passwordController.text.length < 6) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Password must be at least 6 characters')),
+                        );
+
+                      // If all validations pass, navigate to the next page
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                const EmailVerificationPage()),
+                            builder: (context) => const EmailVerificationPage()),
                       );
-                      }
-                    },
+                    }},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: yellowColor,
                       shape: RoundedRectangleBorder(

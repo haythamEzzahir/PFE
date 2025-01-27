@@ -1,5 +1,4 @@
 import 'package:bus_tracker/pages/homepage.dart';
-
 import 'package:flutter/material.dart';
 
 
@@ -11,6 +10,8 @@ class MyApp extends StatelessWidget {
  
   @override
   Widget build(BuildContext context) {
+     
+
     return MaterialApp(
       // ignore: deprecated_member_use
       useInheritedMediaQuery: true,
