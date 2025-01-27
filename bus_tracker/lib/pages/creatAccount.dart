@@ -1,4 +1,6 @@
-import 'package:bus_tracker/pages/virefy.dart';
+// ignore_for_file: avoid_print
+
+import 'package:bus_tracker/pages/verify.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/constants.dart';
 
@@ -9,9 +11,9 @@ class Creataccount extends StatelessWidget {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =TextEditingController();
-  final TextEditingController _mobileController =TextEditingController();
-  
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final TextEditingController _mobileController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +108,14 @@ class Creataccount extends StatelessWidget {
                         print('Email: ${_emailController.text}');
                         print('Password: ${_passwordController.text}');
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const EmailVerificationPage()),
-                      );
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EmailVerificationPage(
+                              email:
+                                  _emailController.text, // Pass the email here
+                            ),
+                          ),
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -125,7 +130,7 @@ class Creataccount extends StatelessWidget {
                       "CREATE ACCOUNT",
                       style: boldTextStyle,
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
