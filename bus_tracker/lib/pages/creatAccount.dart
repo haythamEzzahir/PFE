@@ -1,4 +1,4 @@
-import 'package:bus_tracker/pages/virefy.dart';
+import 'package:bus_tracker/pages/verify.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/constants.dart';
 
@@ -120,13 +120,14 @@ class Creataccount extends StatelessWidget {
                           const SnackBar(content: Text('Password must be at least 6 characters')),
                         );
                         return;
-                      }else{
-                      // If all validations pass, navigate to the next page
-                       String userEmail = _emailController.text;
+
+                      }
+
+                      else{// If all validations pass, navigate to the next page
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => EmailVerificationPage(email: userEmail)),
+                            builder: (context) => const EmailVerificationPage()),
                       );
                     }},
                     style: ElevatedButton.styleFrom(
