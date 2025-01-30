@@ -5,8 +5,9 @@ import 'constants.dart';
 import 'package:bus_tracker/pages/view_buses.dart';
 
 class EmailVerificationPage extends StatefulWidget {
-  const EmailVerificationPage({super.key});
-
+  final String email;
+  const EmailVerificationPage({super.key , required this.email});
+  
   @override
   _EmailVerificationPageState createState() => _EmailVerificationPageState();
 }
@@ -16,7 +17,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     4,
     (index) => TextEditingController(),
   );
-
+   
   // Error message visibility
   String? errorMessage;
 
@@ -62,7 +63,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
           // Subtitle
           Text(
-            "Please enter the 4-digit code sent to your email:\npnclar01@louisville.edu",
+            "Please enter the 4-digit code sent to ${widget.email}",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey[700]),
           ),

@@ -119,12 +119,14 @@ class Creataccount extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Password must be at least 6 characters')),
                         );
-
+                        return;
+                      }else{
                       // If all validations pass, navigate to the next page
+                       String userEmail = _emailController.text;
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const EmailVerificationPage()),
+                            builder: (context) => EmailVerificationPage(email: userEmail)),
                       );
                     }},
                     style: ElevatedButton.styleFrom(

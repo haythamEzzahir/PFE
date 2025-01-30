@@ -118,13 +118,71 @@ class CustomBottomBar extends StatelessWidget {
   }
 }
 
+
+// button 
+ class Mybutton extends StatelessWidget {
+ 
+ final Function()? onTap;
+ final String text;
+  const Mybutton({super.key,required this.onTap,required this.text});
+
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+       onTap: onTap ,
+          child : Container(
+            padding:const EdgeInsets.all(20),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: yellowColor,
+              borderRadius: BorderRadius.circular(8),),
+            child: Center(
+              child: Text(
+                text,
+                style: const TextStyle( 
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+
+              ),
+              ),
+          )
+  );
+  }
+}
+                   
+  //squre Tile for google and apple
+  class squareTile extends StatelessWidget {
+  final String imagePath;
+  const squareTile({super.key , required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border : Border.all(color: Colors.white),
+        borderRadius: BorderRadius.circular(16),
+        color:yellowColor,
+      ),
+      child: Image.asset(
+        imagePath,
+        height: 40,
+      ),
+    );
+  }
+}       
+
+                   
+                    
+   
  
 
 
 
 //textField
-
-
 
 class CustomTextField extends StatefulWidget {
   final String labelText;
