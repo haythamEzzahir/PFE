@@ -1,15 +1,18 @@
-// ignore_for_file: avoid_print
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'view_buses.dart';
 import 'constants.dart';
-import 'package:bus_tracker/pages/view_buses.dart';
 
 class EmailVerificationPage extends StatefulWidget {
-  final String email;  // Declare a final variable to hold the email
-  const EmailVerificationPage({super.key, required this.email});
+  final String email;
+  final String verificationId; // Add verificationId
+  const EmailVerificationPage({
+    super.key,
+    required this.email,
+    required this.verificationId,
+  });
 
   @override
-  // ignore: library_private_types_in_public_api
   _EmailVerificationPageState createState() => _EmailVerificationPageState();
 }
 
@@ -19,13 +22,43 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     (index) => TextEditingController(),
   );
 
-  // Error message visibility
   String? errorMessage;
 
   bool isValidCode() {
-    // Check if all the entered values are digits and the length is 4
     String code = controllers.map((c) => c.text).join();
     return code.length == 4 && code.contains(RegExp(r'^\d+$'));
+  }
+
+  Future<void> _verifyCode(BuildContext context) async {
+    String code = controllers.map((c) => c.text).join();
+
+    if (!isValidCode()) {
+      setState(() {
+        errorMessage = "Please enter a valid 4-digit code.";
+      });
+      return;
+    }
+
+    try {
+      // Create a PhoneAuthCredential with the code
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: widget.verificationId,
+        smsCode: code,
+      );
+
+      // Sign in with the credential
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Navigate to the next page
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ViewBuses()),
+      );
+    } catch (e) {
+      setState(() {
+        errorMessage = "Invalid verification code.";
+      });
+    }
   }
 
   @override
@@ -44,32 +77,25 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Bus Image
           Image.asset(
             'assets/images/bus.png',
             width: 100,
             height: 100,
             fit: BoxFit.contain,
           ),
-
-          // Title
           const Text(
-            "Verify your email",
+            "Verify your phone number",
             style: TextStyle(
               fontSize: 42,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-
-          // Subtitle
           Text(
-            "Please enter the 4-digit code sent to your email:\n${widget.email}",
+            "Please enter the 4-digit code sent to your phone number.",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey[700]),
           ),
-
-          // Code Input Fields
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(4, (index) {
@@ -105,8 +131,6 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               );
             }),
           ),
-
-          // Error message (if any)
           if (errorMessage != null)
             Text(
               errorMessage!,
@@ -116,26 +140,8 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
           ElevatedButton(
-            onPressed: () {
-              String code = controllers.map((c) => c.text).join();
-
-              if (!isValidCode()) {
-                setState(() {
-                  errorMessage = "Please enter a valid 4-digit code.";
-                });
-              } else {
-                setState(() {
-                  errorMessage = null; // Clear error if valid
-                });
-                print("Verification code: $code");
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ViewBuses()),
-                );
-              }
-            },
+            onPressed: () => _verifyCode(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: yellowColor,
               shape: RoundedRectangleBorder(
