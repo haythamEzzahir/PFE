@@ -1,6 +1,8 @@
+import 'package:bus_tracker/pages/auth_page.dart';
 import 'package:bus_tracker/pages/constants.dart';
-import 'package:bus_tracker/pages/login.dart';
+// import 'package:bus_tracker/pages/login.dart';
 import 'package:bus_tracker/pages/creatAccount.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // Import the next page
 
@@ -96,7 +98,7 @@ class Welcome extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) =>  LoginPage()),
+            MaterialPageRoute(builder: (context) =>  const AuthPage()),
           );
         },
       ),

@@ -1,6 +1,7 @@
-
-import 'package:bus_tracker/pages/view_buses.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:bus_tracker/pages/services/google_auth.dart';
+// import 'package:bus_tracker/pages/view_buses.dart';
 import 'package:bus_tracker/pages/constants.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,28 +16,17 @@ class _LoginPageState extends State<LoginPage> {
   final emailRegex =
       RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
-  void signUserIn() {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+  void signUserIn() async{
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text, 
+      password: _passwordController.text,
       );
-      return;
-    }
-
-    // Validate email format
-
-    if (!emailRegex.hasMatch(_emailController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email address')),
-      );
-      return;
-    }
 
     // If all validations pass, navigate to the next page
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ViewBuses()),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) =>  ViewBuses()),
+    // );
   }
 
   @override
@@ -77,18 +67,8 @@ class _LoginPageState extends State<LoginPage> {
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
                     controller: _emailController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Email cannot be empty';
-                      }
-                      final emailRegex = RegExp(
-                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-                      if (!emailRegex.hasMatch(value)) {
-                        return 'Invalid email address';
-                      }
-                      return null;
-                    },
                   ),
+
                   const SizedBox(height: 50),
                   CustomTextField(
                     labelText: 'Password',
@@ -147,14 +127,21 @@ class _LoginPageState extends State<LoginPage> {
                     height: 30,
                   ),
 
-                     const Row(
+                     Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                      children: [
-                       squareTile(imagePath: 'assets/images/googleL.png'),
+                       squareTile(
+                        imagePath: 'assets/images/gr.png',
+                        onTap:() => AuthService().signInWithGoogle(),
+                       ),
+                       
 
-                     SizedBox(width: 20,),
+                     const SizedBox(width: 20,),
 
-                       squareTile(imagePath: 'assets/images/appleLogo.png'),
+                        squareTile(
+                          imagePath: 'assets/images/aapple.png',
+                          onTap:() => AuthService().signInWithGoogle()
+                          ),
 
                      ],
                    ),

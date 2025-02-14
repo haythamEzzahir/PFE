@@ -21,33 +21,44 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBackPressed;
   final Color backgroundColor;
   final TextStyle? titleTextStyle;
+  final bool showLogoutButton;
+  final VoidCallback? onLogoutPressed;
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.title,
     this.onBackPressed,
-    this.backgroundColor = yellowColor,
+    this.backgroundColor = Colors.yellow,
     this.titleTextStyle,
-  }) : super(key: key);
+    this.showLogoutButton = false,
+    this.onLogoutPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios, color: Colors.black),
-        onPressed: onBackPressed ?? () => Navigator.pop(context), // Default action
+        icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+        onPressed: onBackPressed ?? () => Navigator.pop(context),
       ),
       title: Text(
         title,
-        style: titleTextStyle ?? boldTextStyle,
+        style: titleTextStyle ?? const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
       ),
       centerTitle: true,
       backgroundColor: backgroundColor,
+      actions: [
+        if (showLogoutButton)
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.black),
+            onPressed: onLogoutPressed,
+          ),
+      ],
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight); // Default AppBar height
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 
@@ -94,10 +105,10 @@ class CustomBottomBar extends StatelessWidget {
   final VoidCallback? onTap;
 
   const CustomBottomBar({
-    Key? key,
+    super.key,
     required this.text,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -156,20 +167,24 @@ class CustomBottomBar extends StatelessWidget {
   //squre Tile for google and apple
   class squareTile extends StatelessWidget {
   final String imagePath;
-  const squareTile({super.key , required this.imagePath});
+  final Function()? onTap;
+   squareTile({super.key , required this.imagePath, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border : Border.all(color: Colors.white),
-        borderRadius: BorderRadius.circular(16),
-        color:yellowColor,
-      ),
-      child: Image.asset(
-        imagePath,
-        height: 40,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border : Border.all(color: Colors.white),
+          borderRadius: BorderRadius.circular(16),
+          color:Colors.grey[200],
+        ),
+        child: Image.asset(
+          imagePath,
+          height: 40,
+        ),
       ),
     );
   }
@@ -193,14 +208,14 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.labelText,
     this.isPassword = false,
     this.controller,
     this.labelStyle,
     this.keyboardType = TextInputType.text,
     this.validator,
-  }) : super(key: key);
+  });
 
   @override
   _CustomTextFieldState createState() => _CustomTextFieldState();
