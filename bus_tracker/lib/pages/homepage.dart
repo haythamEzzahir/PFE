@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bus_tracker/pages/welcome.dart'; 
+import 'package:bus_tracker/pages/welcome.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -23,54 +23,74 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Stack(alignment: Alignment.center, children: [
-          Image.asset(
-            'assets/images/bg.png',
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.cover,
-          ),
-          Container(
-            width: 146,
-            height: 146,
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(255, 223, 0, 1),
-              borderRadius: BorderRadius.circular(17),
-            ),
-            child: Image.asset(
-              'assets/images/bus.png',
-              width: 111,
-              height: 111,
-            ),
-          ),
-          const Positioned(
-            top: 81,
-            child: Text(
-              'Welcome!',
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Background Image
+            Positioned(
+              child: Image.asset(
+                'assets/images/bg.png',
+                width: double.infinity,
+                height: double.infinity, // Replace with your image asset
+                fit: BoxFit.cover, // Ensures the image covers the entire screen
               ),
             ),
-          ),
-          const Positioned(
-            top: 494,
-            child: Text(
-              'TRIPS',
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
+
+            // Content Layer: Positioned Widgets, Text, and other UI components
+            Center(
+              child: Column(
+                children: [
+                  const SizedBox(height: 80), // Adds space from the top
+
+                  // Widget 1 - First Text
+                  const Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text(
+                      'Welcome!',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+
+                  const SizedBox(height: 180),
+                  Container(
+                    width: 146,
+                    height: 146,
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(255, 223, 0, 1),
+                      borderRadius: BorderRadius.circular(17),
+                    ),
+                    child: Image.asset(
+                      'assets/images/bus.png', // Replace with your bus image asset
+                      width: 111,
+                      height: 111,
+                    ),
+                  ),
+
+                  // Adds flexible space between widgets
+
+                  // Widget 3 - Text "TRIPS"
+                  const Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text(
+                      'BusTrack',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+            
+                ],
               ),
             ),
-          ),
-        ]),
-      ),
+          ],
+        )
+      )
     );
   }
 }
+     
+     

@@ -1,46 +1,53 @@
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
+  // Get the current user
   User? getCurrentUser() {
     return _firebaseAuth.currentUser;
   }
 
   // Google sign-in
-  Future<void> signInWithGoogle() async {
+  Future<User?> signInWithGoogle() async {
     try {
-      // Start the sign-in process
-      final GoogleSignIn _googleSignIn = GoogleSignIn(
-        clientId: "759707120454-1gl8v2jcu37j7kah2foailvdnagujr63.apps..googleusercontent.com", // Use your Web Client ID
-        scopes: ['email'],
-      );
-
-      // Try to sign in silently (if the user has signed in previously)
-      GoogleSignInAccount? gUser = await _googleSignIn.signInSilently();
+      // Attempt to sign in silently (if the user has signed in previously)
+      GoogleSignInAccount? googleUser = await _googleSignIn.signInSilently();
       
       // If no user is signed in silently, perform interactive sign-in
-      if (gUser == null) {
-        gUser = await _googleSignIn.signIn();
+      googleUser ??= await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        log("Google Sign-In was canceled by the user.");
+        return null;
       }
 
       // Obtain authentication details from the Google account
-      final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
       // Create a credential using the Google sign-in token
-      final credential = GoogleAuthProvider.credential(
-        accessToken: gAuth.accessToken,
-        idToken: gAuth.idToken,
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
       // Sign in with the credential
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
 
-      log("User signed in: ${gUser.email}");
+      // Log the user's email
+      log("User signed in: ${userCredential.user?.email}");
+
+      // Return the signed-in user
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      log("FirebaseAuthException: ${e.code} - ${e.message}");
+      return null;
     } on Exception catch (e) {
       log("Exception: $e");
+      return null;
     }
   }
 }

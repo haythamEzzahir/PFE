@@ -1,10 +1,12 @@
+import 'package:bus_tracker/pages/creatAccount.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/services/google_auth.dart';
-// import 'package:bus_tracker/pages/view_buses.dart';
 import 'package:bus_tracker/pages/constants.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -13,20 +15,12 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final emailRegex =
-      RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
-  void signUserIn() async{
+  void signUserIn() async {
     await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _emailController.text, 
+      email: _emailController.text,
       password: _passwordController.text,
-      );
-
-    // If all validations pass, navigate to the next page
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) =>  ViewBuses()),
-    // );
+    );
   }
 
   @override
@@ -36,9 +30,7 @@ class _LoginPageState extends State<LoginPage> {
         appBar: const CustomAppBar(
           title: 'TRIPS',
         ),
-        body:
-      
-         Padding(
+        body: Padding(
           padding: const EdgeInsets.all(30.0),
           child: SingleChildScrollView(
             child: Form(
@@ -127,43 +119,45 @@ class _LoginPageState extends State<LoginPage> {
                     height: 30,
                   ),
 
-                     Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                       squareTile(
-                        imagePath: 'assets/images/gr.png',
-                        onTap:() => AuthService().signInWithGoogle(),
-                       ),
-                       
-
-                     const SizedBox(width: 20,),
-
-                        squareTile(
-                          imagePath: 'assets/images/aapple.png',
-                          onTap:() => AuthService().signInWithGoogle()
-                          ),
-
-                     ],
-                   ),
+                    children: [
+                      squareTile(
+                        imagePath: 'assets/images/google.png',
+                        onTap: () => AuthService().signInWithGoogle(),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      squareTile(
+                          imagePath: 'assets/images/apple.png',
+                          onTap: () => AuthService().signInWithGoogle()),
+                    ],
+                  ),
 
                   const SizedBox(
                     height: 30,
                   ),
 
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Not a menber?'),
-                      SizedBox(width: 5),
-                      Text(
-                        'Register now',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
+                      const Text('Not a member?'),
+                      const SizedBox(width: 5),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Creataccount()));
+                        },
+                        child: const Text(
+                          'Register now',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      )
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),

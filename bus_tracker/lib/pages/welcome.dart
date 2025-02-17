@@ -61,15 +61,15 @@ class Welcome extends StatelessWidget {
 
                   // Widget 3 - Text "TRIPS"
                   const Padding(
-                    padding: EdgeInsets.all(20.0),
+                    padding: EdgeInsets.all(15.0),
                     child: Text(
-                      'TRIPS',
+                      'BusTrack',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),
 
-                  const SizedBox(height: 160),
+                  const SizedBox(height: 180),
                   TextButton(
                       onPressed: () {
                         Navigator.push(

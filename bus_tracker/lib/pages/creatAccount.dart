@@ -1,5 +1,5 @@
 import 'package:bus_tracker/pages/login.dart';
-import 'package:bus_tracker/pages/verify.dart';
+// import 'package:bus_tracker/pages/verify.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/constants.dart';
 

@@ -15,8 +15,8 @@ class AuthPage extends StatelessWidget {
         }
 
         else{
-          return LoginPage();
-          // onTap: () {  },
+          return const LoginPage();
+          
         }
       }
       
