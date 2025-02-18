@@ -65,7 +65,7 @@ class _HomepageState extends State<Homepage> {
                       borderRadius: BorderRadius.circular(17),
                     ),
                     child: Image.asset(
-                      'assets/images/bus.png', // Replace with your bus image asset
+                      'assets/images/bus.png',
                       width: 111,
                       height: 111,
                     ),

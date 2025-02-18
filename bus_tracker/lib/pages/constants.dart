@@ -28,7 +28,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.title,
     this.onBackPressed,
-    this.backgroundColor = Colors.yellow,
+    this.backgroundColor = const Color(0xFFFFDF00),
     this.titleTextStyle,
     this.showLogoutButton = false,
     this.onLogoutPressed,
