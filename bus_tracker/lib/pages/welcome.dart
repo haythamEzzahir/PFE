@@ -75,7 +75,7 @@ class Welcome extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Creataccount()),
+                              builder: (context) => CreateAccount()),
                         );
                       },
                     

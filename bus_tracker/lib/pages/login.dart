@@ -1,5 +1,6 @@
 import 'package:bus_tracker/pages/creatAccount.dart';
 import 'package:bus_tracker/pages/forgotPasswordPage.dart';
+import 'package:bus_tracker/pages/view_buses.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/services/google_auth.dart';
@@ -18,14 +19,41 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
 
   void signUserIn() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _emailController.text,
-      password: _passwordController.text,
-    );
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Login successful!')));
+
+      // Navigate to the "view buses" page after successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ViewBuses()), // Replace with your "view buses" page
+      );
+    } on FirebaseAuthException catch (e) {
+      String message = 'An error occurred. Please try again.';
+      
+      if (e.code == 'user-not-found') {
+        message = 'User not found. Please register.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Incorrect password. Please try again.';
+      } else {
+        message = e.message ?? message;
+      }
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    var keyboardType = null;
     return SafeArea(
       child: Scaffold(
         appBar: const CustomAppBar(
@@ -60,13 +88,29 @@ class _LoginPageState extends State<LoginPage> {
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
                     controller: _emailController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email cannot be empty';
+                      }
+                      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                        return 'Enter a valid email';
+                      }
+                      return null;
+                    },
                   ),
 
                   const SizedBox(height: 50),
+
                   CustomTextField(
                     labelText: 'Password',
                     isPassword: true,
                     controller: _passwordController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Password cannot be empty';
+                      }
+                      return null;
+                    }, keyboardType: keyboardType,
                   ),
 
                   const SizedBox(height: 20),
@@ -76,12 +120,15 @@ class _LoginPageState extends State<LoginPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                       GestureDetector(
-                        onTap: (){
-                         Navigator.push(context, MaterialPageRoute(builder: (context){
-                          return ForgotPasswordPage();
-                         }),); 
-                        },
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ForgotPasswordPage(),
+                              ),
+                            );
+                          },
                           child: Text(
                             "forgot password?",
                             style: TextStyle(color: Colors.grey[600]),
@@ -97,8 +144,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 50),
 
-                  // google authentification
-
+                  // Google authentication
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Row(
@@ -138,8 +184,9 @@ class _LoginPageState extends State<LoginPage> {
                         width: 20,
                       ),
                       squareTile(
-                          imagePath: 'assets/images/apple.png',
-                          onTap: () => AuthService().signInWithGoogle()),
+                        imagePath: 'assets/images/apple.png',
+                        onTap: () => AuthService().signInWithGoogle(),
+                      ),
                     ],
                   ),
 
@@ -154,7 +201,12 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(width: 5),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Creataccount()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CreateAccount(),
+                            ),
+                          );
                         },
                         child: const Text(
                           'Register now',
@@ -172,6 +224,37 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class CustomTextField extends StatelessWidget {
+  final String labelText;
+  final TextInputType keyboardType;
+  final TextEditingController controller;
+  final bool isPassword;
+  final String? Function(String?)? validator;
+
+  const CustomTextField({
+    super.key,
+    required this.labelText,
+    required this.keyboardType,
+    required this.controller,
+    this.isPassword = false,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(),
+      ),
+      validator: validator,
     );
   }
 }
