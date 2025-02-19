@@ -1,14 +1,17 @@
 import 'package:bus_tracker/pages/homepage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'firebase_options.dart';  // Firebase initialization options (auto-generated)
+import 'firebase_options.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();  // Ensure Flutter is initialized
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,  // Make sure you have the correct options
   );
-  runApp(const MyApp());
+  runApp( const MyApp());
+ 
+      
 }
 
 class MyApp extends StatelessWidget {

@@ -52,7 +52,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
       // Navigate to the next page
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const ViewBuses()),
+        MaterialPageRoute(builder: (context) =>  ViewBuses()),
       );
     } catch (e) {
       setState(() {

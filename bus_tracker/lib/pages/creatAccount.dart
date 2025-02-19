@@ -1,92 +1,91 @@
+import 'package:bus_tracker/pages/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'verify.dart'; // Your verification page
-import 'constants.dart';
+import 'package:bus_tracker/pages/services/google_auth.dart';
+import 'package:bus_tracker/pages/constants.dart';
 
-final _formKey = GlobalKey<FormState>();
+class CreateAccount extends StatefulWidget {
+  const CreateAccount({super.key});
 
-class Creataccount extends StatelessWidget {
-  Creataccount({super.key});
+  @override
+  _CreateAccountState createState() => _CreateAccountState();
+}
 
+class _CreateAccountState extends State<CreateAccount> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _mobileController = TextEditingController();
-  final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
-  Future<void> _verifyPhoneNumber(BuildContext context) async {
-    String phoneNumber = _mobileController.text.trim();
-
-    // Ensure the phone number is in the correct format (e.g., +1234567890)
-    if (!phoneNumber.startsWith('+')) {
-      phoneNumber = '+212$phoneNumber';
-    }
+  void registerUser() async {
+    if (!_formKey.currentState!.validate()) return;
 
     try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto-sign-in if the verification is completed automatically
-          await FirebaseAuth.instance.signInWithCredential(credential);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EmailVerificationPage(
-                email: _emailController.text,
-                verificationId: '', // Not needed here
-              ),
-            ),
-          );
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Verification failed: ${e.message}')),
-          );
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          // Navigate to the verification page with the verificationId
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EmailVerificationPage(
-                email: _emailController.text,
-                verificationId: verificationId,
-              ),
-            ),
-          );
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle timeout if needed
-        },
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      await FirebaseFirestore.instance.collection('users').doc(_emailController.text).set({
+        'name': _nameController.text,
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account created successfully!')));
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating account: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    var keyboardType = null;
+    var keyboardType2 = null;
     return SafeArea(
       child: Scaffold(
-        appBar: const CustomAppBar(title: 'TRIPS'),
+        appBar: const CustomAppBar(
+          title: 'BusTrack',
+        ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(30.0),
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 100),
                   const Text(
                     "Create account",
                     style: TextStyle(
-                      fontSize: 50,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 50),
+
+                  const SizedBox(height: 30),
+
+                  CustomTextField(
+                    labelText: 'Name',
+                    keyboardType: TextInputType.text,
+                    controller: _nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Name cannot be empty';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 25),
+
                   CustomTextField(
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
@@ -95,13 +94,15 @@ class Creataccount extends StatelessWidget {
                       if (value == null || value.isEmpty) {
                         return 'Email cannot be empty';
                       }
-                      if (!emailRegex.hasMatch(value)) {
-                        return 'Invalid email address';
+                      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                        return 'Enter a valid email';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 50),
+
+                  const SizedBox(height: 25),
+
                   CustomTextField(
                     labelText: 'Password',
                     isPassword: true,
@@ -110,57 +111,97 @@ class Creataccount extends StatelessWidget {
                       if (value == null || value.isEmpty) {
                         return 'Password cannot be empty';
                       }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters long';
-                      }
                       return null;
-                    },
+                    }, keyboardType: keyboardType2,
                   ),
-                  const SizedBox(height: 50),
+
+                  const SizedBox(height: 25),
+
                   CustomTextField(
-                    labelText: 'Re-enter Password',
+                    labelText: 'Re-enter password',
                     isPassword: true,
                     controller: _confirmPasswordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please confirm your password';
+                        return 'Confirm password cannot be empty';
                       }
                       if (value != _passwordController.text) {
                         return 'Passwords do not match';
                       }
                       return null;
-                    },
+                    }, keyboardType: keyboardType,
                   ),
-                  const SizedBox(height: 50),
-                  CustomTextField(
-                    labelText: 'Mobile #',
-                    isPassword: false,
-                    keyboardType: TextInputType.phone,
-                    controller: _mobileController,
+
+                  const SizedBox(height: 40),
+
+                  Mybutton(onTap: registerUser, text: "CREATE ACCOUNT"),
+
+                  const SizedBox(height: 40),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            thickness: 1.0,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 5.0),
+                          child: Text("Or continue with"),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            thickness: 1.0,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 90),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        await _verifyPhoneNumber(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Form validation failed')),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: yellowColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(17),
+
+                  const SizedBox(height: 30),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      squareTile(
+                        imagePath: 'assets/images/google.png',
+                        onTap: () => AuthService().signInWithGoogle(),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 50),
-                    ),
-                    child: const Text(
-                      "CREATE ACCOUNT",
-                      style: boldTextStyle,
-                    ),
+                      const SizedBox(width: 30),
+                      squareTile(
+                        imagePath: 'assets/images/apple.png',
+                        onTap: () => AuthService().signInWithGoogle(),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Already have an account?'),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginPage()),
+                          );
+                        },
+                        child: const Text(
+                          'Sign in',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -168,6 +209,37 @@ class Creataccount extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class CustomTextField extends StatelessWidget {
+  final String labelText;
+  final TextInputType keyboardType;
+  final TextEditingController controller;
+  final bool isPassword;
+  final String? Function(String?)? validator;
+
+  const CustomTextField({
+    super.key,
+    required this.labelText,
+    required this.keyboardType,
+    required this.controller,
+    this.isPassword = false,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(),
+      ),
+      validator: validator,
     );
   }
 }

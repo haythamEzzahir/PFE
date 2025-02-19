@@ -1,6 +1,8 @@
+import 'package:bus_tracker/pages/auth_page.dart';
 import 'package:bus_tracker/pages/constants.dart';
-import 'package:bus_tracker/pages/login.dart';
+// import 'package:bus_tracker/pages/login.dart';
 import 'package:bus_tracker/pages/creatAccount.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // Import the next page
 
@@ -59,21 +61,21 @@ class Welcome extends StatelessWidget {
 
                   // Widget 3 - Text "TRIPS"
                   const Padding(
-                    padding: EdgeInsets.all(20.0),
+                    padding: EdgeInsets.all(15.0),
                     child: Text(
-                      'TRIPS',
+                      'BusTrack',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),
 
-                  const SizedBox(height: 160),
+                  const SizedBox(height: 180),
                   TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Creataccount()),
+                              builder: (context) => CreateAccount()),
                         );
                       },
                     
@@ -96,7 +98,7 @@ class Welcome extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) =>  LoginPage()),
+            MaterialPageRoute(builder: (context) =>  const AuthPage()),
           );
         },
       ),
