@@ -90,15 +90,14 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _emailController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Email cannot be empty';
+                        return 'Email is required';
                       }
-                      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                         return 'Enter a valid email';
                       }
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 50),
 
                   CustomTextField(
@@ -107,10 +106,10 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password cannot be empty';
+                        return 'Please enter a password';
                       }
                       return null;
-                    }, keyboardType: keyboardType,
+                    },
                   ),
 
                   const SizedBox(height: 20),
@@ -224,37 +223,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class CustomTextField extends StatelessWidget {
-  final String labelText;
-  final TextInputType keyboardType;
-  final TextEditingController controller;
-  final bool isPassword;
-  final String? Function(String?)? validator;
-
-  const CustomTextField({
-    super.key,
-    required this.labelText,
-    required this.keyboardType,
-    required this.controller,
-    this.isPassword = false,
-    this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        labelText: labelText,
-        border: OutlineInputBorder(),
-      ),
-      validator: validator,
     );
   }
 }

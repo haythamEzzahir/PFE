@@ -17,38 +17,50 @@ class _CreateAccountState extends State<CreateAccount> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   void registerUser() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match!')),
+      );
+      return;
+    }
+
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
-      await FirebaseFirestore.instance.collection('users').doc(_emailController.text).set({
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_emailController.text)
+          .set({
         'name': _nameController.text,
         'email': _emailController.text,
         'password': _passwordController.text,
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account created successfully!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created successfully!')));
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating account: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error creating account: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var keyboardType = null;
-    var keyboardType2 = null;
     return SafeArea(
       child: Scaffold(
         appBar: const CustomAppBar(
@@ -69,75 +81,63 @@ class _CreateAccountState extends State<CreateAccount> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   CustomTextField(
                     labelText: 'Name',
                     keyboardType: TextInputType.text,
                     controller: _nameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Name cannot be empty';
+                        return 'Name is required';
                       }
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 25),
-
                   CustomTextField(
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
                     controller: _emailController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Email cannot be empty';
+                        return 'Email is required';
                       }
-                      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                         return 'Enter a valid email';
                       }
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 25),
-
                   CustomTextField(
                     labelText: 'Password',
                     isPassword: true,
                     controller: _passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password cannot be empty';
+                        return 'Please enter a password';
                       }
                       return null;
-                    }, keyboardType: keyboardType2,
+                    },
                   ),
-
                   const SizedBox(height: 25),
-
                   CustomTextField(
                     labelText: 'Re-enter password',
                     isPassword: true,
                     controller: _confirmPasswordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Confirm password cannot be empty';
+                        return 'Please confirm your password';
                       }
                       if (value != _passwordController.text) {
                         return 'Passwords do not match';
                       }
                       return null;
-                    }, keyboardType: keyboardType,
+                    },
                   ),
-
                   const SizedBox(height: 40),
-
                   Mybutton(onTap: registerUser, text: "CREATE ACCOUNT"),
-
                   const SizedBox(height: 40),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Row(
@@ -161,9 +161,7 @@ class _CreateAccountState extends State<CreateAccount> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -178,9 +176,7 @@ class _CreateAccountState extends State<CreateAccount> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 40),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -190,7 +186,8 @@ class _CreateAccountState extends State<CreateAccount> {
                         onTap: () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const LoginPage()),
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
                           );
                         },
                         child: const Text(
@@ -209,37 +206,6 @@ class _CreateAccountState extends State<CreateAccount> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class CustomTextField extends StatelessWidget {
-  final String labelText;
-  final TextInputType keyboardType;
-  final TextEditingController controller;
-  final bool isPassword;
-  final String? Function(String?)? validator;
-
-  const CustomTextField({
-    super.key,
-    required this.labelText,
-    required this.keyboardType,
-    required this.controller,
-    this.isPassword = false,
-    this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        labelText: labelText,
-        border: OutlineInputBorder(),
-      ),
-      validator: validator,
     );
   }
 }
