@@ -72,7 +72,7 @@ class _ViewBusesState extends State<ViewBuses> {
                   ),
                   const SizedBox(width: 10),
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         userName,
