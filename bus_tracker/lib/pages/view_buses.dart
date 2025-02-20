@@ -1,7 +1,59 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:bus_tracker/pages/login.dart';
 
-class ViewBuses extends StatelessWidget {
+class ViewBuses extends StatefulWidget {
   const ViewBuses({super.key});
+
+  @override
+  _ViewBusesState createState() => _ViewBusesState();
+}
+
+class _ViewBusesState extends State<ViewBuses> {
+  String userName = "Loading..."; // Default text before fetching data
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      setState(() => userName = "Guest");
+      return;
+    }
+
+    // Use email as the document ID
+    String email = user.email ?? "";
+    if (email.isEmpty) {
+      setState(() => userName = "No Email Found");
+      return;
+    }
+
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(email) // Using email as document ID
+        .get();
+
+    if (userDoc.exists) {
+      Map<String, dynamic>? data = userDoc.data() as Map<String, dynamic>?;
+      if (data != null && data.containsKey('name')) {
+        setState(() => userName = data['name'] ?? "No Name");
+      } else {
+        setState(() => userName = "Name not available");
+      }
+    } else {
+      setState(() => userName = "No Data Found");
+    }
+  } catch (e) {
+    print("Error fetching user name: $e");
+    setState(() => userName = "Error Loading");
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -11,12 +63,6 @@ class ViewBuses extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
-              ),
               child: Row(
                 children: [
                   const CircleAvatar(
@@ -28,9 +74,9 @@ class ViewBuses extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'mohamed ourhouch',
-                        style: TextStyle(
+                      Text(
+                        userName,
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -40,10 +86,7 @@ class ViewBuses extends StatelessWidget {
                         onPressed: () {},
                         child: const Text(
                           'View Profile',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
+                          style: TextStyle(color: Colors.grey, fontSize: 14),
                         ),
                       ),
                     ],
@@ -88,17 +131,19 @@ class ViewBuses extends StatelessWidget {
                 ],
               ),
             ),
-            Image.asset(
-              'assets/images/bus.png',
-              width: 100,
-              height: 100,
-            ),
+            Image.asset('assets/images/bus.png', width: 100, height: 100),
             const SizedBox(height: 30),
             Container(
               padding: const EdgeInsets.all(16),
-              alignment: Alignment.center, // This centers the button
+              alignment: Alignment.center,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(255, 223, 0, 1),
                   shape: RoundedRectangleBorder(
@@ -110,11 +155,7 @@ class ViewBuses extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.logout,
-                      color: Colors.black,
-                      size: 20,
-                    ),
+                    Icon(Icons.logout, color: Colors.black, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Logout',
@@ -134,10 +175,7 @@ class ViewBuses extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              'assets/images/bg.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/images/bg.png', fit: BoxFit.cover),
           ),
           Column(
             children: [
@@ -233,7 +271,7 @@ class ViewBuses extends StatelessWidget {
       child: Align(
         alignment: Alignment.center,
         child: Container(
-          width: 250, // Adjust the width as needed
+          width: 250,
           height: 1,
           color: Colors.grey[300],
         ),

@@ -23,39 +23,26 @@ class _CreateAccountState extends State<CreateAccount> {
   void registerUser() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match!')),
-      );
-      return;
-    }
-
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_emailController.text)
-          .set({
+      await FirebaseFirestore.instance.collection('users').doc(_emailController.text).set({
         'name': _nameController.text,
         'email': _emailController.text,
         'password': _passwordController.text,
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Account created successfully!')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account created successfully!')));
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error creating account: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating account: $e')));
     }
   }
 

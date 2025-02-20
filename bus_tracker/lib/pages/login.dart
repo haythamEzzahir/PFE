@@ -33,11 +33,13 @@ class _LoginPageState extends State<LoginPage> {
       // Navigate to the "view buses" page after successful login
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ViewBuses()), // Replace with your "view buses" page
+        MaterialPageRoute(
+            builder: (context) =>
+                const ViewBuses()), // Replace with your "view buses" page
       );
     } on FirebaseAuthException catch (e) {
       String message = 'An error occurred. Please try again.';
-      
+
       if (e.code == 'user-not-found') {
         message = 'User not found. Please register.';
       } else if (e.code == 'wrong-password') {
@@ -53,7 +55,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    var keyboardType = null;
     return SafeArea(
       child: Scaffold(
         appBar: const CustomAppBar(
