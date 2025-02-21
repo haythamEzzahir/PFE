@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bus_tracker/pages/constants.dart'; // Ensure this import is correct
- // Import MyButton
+// Import MyButton
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -30,23 +30,34 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       });
 
       try {
-        await FirebaseAuth.instance.sendPasswordResetEmail(
-          email: _emailController.text.trim(),
+        // Check if the email exists in Firebase
+        final signInMethods =
+            await FirebaseAuth.instance.fetchSignInMethodsForEmail(
+          _emailController.text.trim(),
         );
-        setState(() {
-          _message = 'Password reset email sent. Check your inbox.';
-        });
+
+        if (signInMethods.isEmpty) {
+          setState(() {
+            _message = 'No user found with this email address.';
+          });
+        } else {
+          // Email exists, send the password reset email
+          await FirebaseAuth.instance.sendPasswordResetEmail(
+            email: _emailController.text.trim(),
+          );
+          setState(() {
+            _message = 'Password reset email sent. Check your inbox.';
+          });
+        }
       } on FirebaseAuthException catch (e) {
         String errorMessage;
         switch (e.code) {
-          case 'user-not-found':
-            errorMessage = 'No user found with this email address.';
-            break;
           case 'invalid-email':
             errorMessage = 'The email address is invalid.';
             break;
           case 'network-request-failed':
-            errorMessage = 'A network error occurred. Please check your connection.';
+            errorMessage =
+                'A network error occurred. Please check your connection.';
             break;
           default:
             errorMessage = e.message ?? 'An error occurred. Please try again.';
@@ -90,7 +101,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
                       return 'Please enter a valid email address';
                     }
                     return null;
@@ -109,7 +121,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   Text(
                     _message,
                     style: TextStyle(
-                      color: _message.contains('error') ? Colors.red : Colors.green,
+                      color: _message.contains('No user found') || _message.contains('error')
+                          ? Colors.red
+                          : Colors.green,
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,

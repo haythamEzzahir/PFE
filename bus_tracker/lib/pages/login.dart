@@ -18,8 +18,18 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  // State variables to store error messages
+  String? _emailError;
+  String? _passwordError;
+
   void signUserIn() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Clear previous error messages
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+    });
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -38,18 +48,21 @@ class _LoginPageState extends State<LoginPage> {
                 const ViewBuses()), // Replace with your "view buses" page
       );
     } on FirebaseAuthException catch (e) {
-      String message = 'An error occurred. Please try again.';
-
       if (e.code == 'user-not-found') {
-        message = 'User not found. Please register.';
+        setState(() {
+          _emailError = 'User not found. Please register.';
+        });
       } else if (e.code == 'wrong-password') {
-        message = 'Incorrect password. Please try again.';
+        setState(() {
+          _passwordError = 'Incorrect password. Please try again.';
+        });
       } else {
-        message = e.message ?? message;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(e.message ?? 'An error occurred. Please try again.')),
+        );
       }
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -72,9 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                     'assets/images/bus.png',
                     height: 80,
                   ),
-
                   const SizedBox(height: 10),
-
                   const Text(
                     "Sign in",
                     style: TextStyle(
@@ -82,9 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   CustomTextField(
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
@@ -98,12 +107,12 @@ class _LoginPageState extends State<LoginPage> {
                       }
                       return null;
                     },
+                    errorText: _emailError, // Pass the email error message
                   ),
                   const SizedBox(height: 50),
-
                   CustomTextField(
                     labelText: 'Password',
-                    isPassword: true,
+                    isPassword: true, // Enable password visibility toggle
                     controller: _passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -111,10 +120,9 @@ class _LoginPageState extends State<LoginPage> {
                       }
                       return null;
                     },
+                    errorText: _passwordError,
                   ),
-
                   const SizedBox(height: 20),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: Row(
@@ -137,14 +145,9 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   Mybutton(onTap: signUserIn, text: "Sign in"),
-
                   const SizedBox(height: 50),
-
-                  // Google authentication
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Row(
@@ -168,11 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-
-                  const SizedBox(
-                    height: 30,
-                  ),
-
+                  const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -180,20 +179,14 @@ class _LoginPageState extends State<LoginPage> {
                         imagePath: 'assets/images/google.png',
                         onTap: () => AuthService().signInWithGoogle(),
                       ),
-                      const SizedBox(
-                        width: 20,
-                      ),
+                      const SizedBox(width: 20),
                       squareTile(
                         imagePath: 'assets/images/apple.png',
                         onTap: () => AuthService().signInWithGoogle(),
                       ),
                     ],
                   ),
-
-                  const SizedBox(
-                    height: 30,
-                  ),
-
+                  const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

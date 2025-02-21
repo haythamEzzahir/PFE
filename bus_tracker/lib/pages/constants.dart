@@ -206,6 +206,7 @@ class CustomTextField extends StatefulWidget {
   final TextStyle? labelStyle;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final String? errorText;
 
   const CustomTextField({
     super.key,
@@ -215,6 +216,7 @@ class CustomTextField extends StatefulWidget {
     this.labelStyle,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.errorText,
   });
 
   @override
@@ -222,14 +224,22 @@ class CustomTextField extends StatefulWidget {
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
-  String? _errorText;
+  String? _internalErrorText;
+  bool _obscureText = true; // State variable to toggle password visibility
 
   void validateInput(String value) {
     if (widget.validator != null) {
       setState(() {
-        _errorText = widget.validator!(value);
+        _internalErrorText = widget.validator!(value);
       });
     }
+  }
+
+  // Function to toggle password visibility
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 
   @override
@@ -239,7 +249,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       children: [
         TextFormField(
           controller: widget.controller,
-          obscureText: widget.isPassword,
+          obscureText: widget.isPassword ? _obscureText : false, // Control visibility for password fields
           keyboardType: widget.keyboardType,
           onChanged: validateInput,
           decoration: InputDecoration(
@@ -251,7 +261,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 ),
             border: const UnderlineInputBorder(),
             contentPadding: const EdgeInsets.only(bottom: 5.0),
-            errorText: _errorText, // Dynamically displays the error message
+            errorText: widget.errorText ?? _internalErrorText, // Dynamically displays the error message
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: _togglePasswordVisibility,
+                  )
+                : null, // Show eye icon only for password fields
           ),
         ),
       ],

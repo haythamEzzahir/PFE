@@ -47,7 +47,7 @@ class _ViewBusesState extends State<ViewBuses> {
         setState(() => userName = "Name not available");
       }
     } else {
-      setState(() => userName = "No Data Found");
+      setState(() => userName = "Enter your name");
     }
   } catch (e) {
     print("Error fetching user name: $e");
