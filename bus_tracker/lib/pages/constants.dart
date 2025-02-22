@@ -261,7 +261,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 ),
             border: const UnderlineInputBorder(),
             contentPadding: const EdgeInsets.only(bottom: 5.0),
-            errorText: widget.errorText ?? _internalErrorText, // Dynamically displays the error message
+            errorText: widget.errorText ?? _internalErrorText, // Prioritize widget.errorText
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(

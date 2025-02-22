@@ -1,62 +1,61 @@
+import 'package:bus_tracker/pages/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'view_buses.dart';
 import 'constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-class EmailVerificationPage extends StatefulWidget {
+class OTPVerificationPage extends StatefulWidget {
   final String email;
-  final String verificationId; // Add verificationId
-  const EmailVerificationPage({
-    super.key,
-    required this.email,
-    required this.verificationId,
-  });
+
+  const OTPVerificationPage({super.key, required this.email});
 
   @override
-  _EmailVerificationPageState createState() => _EmailVerificationPageState();
+  _OTPVerificationPageState createState() => _OTPVerificationPageState();
 }
 
-class _EmailVerificationPageState extends State<EmailVerificationPage> {
-  final List<TextEditingController> controllers = List.generate(
-    4,
-    (index) => TextEditingController(),
-  );
-
+class _OTPVerificationPageState extends State<OTPVerificationPage> {
+  final List<TextEditingController> controllers = List.generate(4, (index) => TextEditingController());
   String? errorMessage;
 
-  bool isValidCode() {
-    String code = controllers.map((c) => c.text).join();
-    return code.length == 4 && code.contains(RegExp(r'^\d+$'));
-  }
-
-  Future<void> _verifyCode(BuildContext context) async {
-    String code = controllers.map((c) => c.text).join();
-
-    if (!isValidCode()) {
-      setState(() {
-        errorMessage = "Please enter a valid 4-digit code.";
-      });
-      return;
-    }
-
+  void verifyOTP() async {
     try {
-      // Create a PhoneAuthCredential with the code
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: widget.verificationId,
-        smsCode: code,
-      );
+      // Combine the OTP digits into a single string
+      String otp = controllers.map((controller) => controller.text).join();
 
-      // Sign in with the credential
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      // For demonstration, we assume the OTP is correct if it's not empty
+      // In a real app, you would validate the OTP with your backend or Firebase
+      if (otp.length == 4) {
+        User user = FirebaseAuth.instance.currentUser!;
 
-      // Navigate to the next page
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) =>  ViewBuses()),
-      );
+        // Reload user to get the latest email verification status
+        await user.reload();
+        user = FirebaseAuth.instance.currentUser!;
+
+        if (user.emailVerified) {
+          // Update Firestore to mark email as verified
+          await FirebaseFirestore.instance.collection('users').doc(widget.email).update({
+            'emailVerified': true,
+          });
+
+          // Navigate to login page
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+          );
+        } else {
+          setState(() {
+            errorMessage = "Email not verified. Please check your email and verify.";
+          });
+        }
+      } else {
+        setState(() {
+          errorMessage = "Invalid OTP. Please enter a 4-digit code.";
+        });
+      }
     } catch (e) {
       setState(() {
-        errorMessage = "Invalid verification code.";
+        errorMessage = "Error verifying OTP: $e";
       });
     }
   }
@@ -84,15 +83,16 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
             fit: BoxFit.contain,
           ),
           const Text(
-            "Verify your phone number",
+            "Verify your email",
             style: TextStyle(
-              fontSize: 42,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
+            textAlign: TextAlign.center,
           ),
           Text(
-            "Please enter the 4-digit code sent to your phone number.",
+            "Please enter the 4-digit code sent to your email.",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey[700]),
           ),
@@ -141,7 +141,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               ),
             ),
           ElevatedButton(
-            onPressed: () => _verifyCode(context),
+            onPressed: verifyOTP,
             style: ElevatedButton.styleFrom(
               backgroundColor: yellowColor,
               shape: RoundedRectangleBorder(

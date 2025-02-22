@@ -22,50 +22,99 @@ class _LoginPageState extends State<LoginPage> {
   String? _emailError;
   String? _passwordError;
 
-  void signUserIn() async {
-    if (!_formKey.currentState!.validate()) return;
+ void signUserIn() async {
+  if (!_formKey.currentState!.validate()) return;
 
-    // Clear previous error messages
-    setState(() {
-      _emailError = null;
-      _passwordError = null;
-    });
+  // Clear previous error messages
+  setState(() {
+    _emailError = null;
+    _passwordError = null;
+  });
 
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+  try {
+    // Sign in with email and password
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    // Check if the email is verified
+    if (userCredential.user!.emailVerified) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login successful!')),
       );
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Login successful!')));
 
       // Navigate to the "view buses" page after successful login
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                const ViewBuses()), // Replace with your "view buses" page
+          builder: (context) => const ViewBuses(), // Replace with your "view buses" page
+        ),
       );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        setState(() {
-          _emailError = 'User not found. Please register.';
-        });
-      } else if (e.code == 'wrong-password') {
-        setState(() {
-          _passwordError = 'Incorrect password. Please try again.';
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text(e.message ?? 'An error occurred. Please try again.')),
-        );
-      }
-    }
-  }
+    } else {
+      // If email is not verified, show a message and prompt the user to verify their email
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please verify your email before logging in.'),
+        ),
+      );
 
+      // Optionally, send a new verification email
+      await userCredential.user!.sendEmailVerification();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A new verification email has been sent.'),
+        ),
+      );
+    }
+  } on FirebaseAuthException catch (e) {
+    // Map Firebase error codes to custom user-friendly messages
+    String errorMessage;
+    switch (e.code) {
+      case 'user-not-found':
+        errorMessage = 'User not found. Please register.';
+        break;
+      case 'wrong-password':
+        errorMessage = 'Incorrect password. Please try again.';
+        break;
+      case 'too-many-requests':
+        errorMessage = 'Too many attempts. Please try again later.';
+        break;
+      case 'invalid-email':
+        errorMessage = 'Invalid email address. Please check your email.';
+        break;
+      default:
+        // Handle the generic error message
+        if (e.message?.contains("supplied auth credential is incorrect") == true) {
+          errorMessage = 'Incorrect email or password. Please try again.';
+        } else {
+          errorMessage = 'An error occurred. Please try again.'; // Generic fallback message
+        }
+    }
+
+    // Set the appropriate error message
+    if (e.code == 'user-not-found' || e.code == 'invalid-email') {
+      setState(() {
+        _emailError = errorMessage;
+      });
+    } else if (e.code == 'wrong-password' || e.code == 'too-many-requests') {
+      setState(() {
+        _passwordError = errorMessage;
+      });
+    } else {
+      // For generic errors, display the message under the password field
+      setState(() {
+        _passwordError = errorMessage;
+      });
+    }
+  } catch (e) {
+    // Handle any other errors
+    setState(() {
+      _passwordError = 'An unexpected error occurred. Please try again.';
+    });
+  }
+}
   @override
   Widget build(BuildContext context) {
     return SafeArea(

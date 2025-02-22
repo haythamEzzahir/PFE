@@ -1,9 +1,12 @@
 import 'package:bus_tracker/pages/login.dart';
+import 'package:bus_tracker/pages/verify.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/services/google_auth.dart';
 import 'package:bus_tracker/pages/constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class CreateAccount extends StatefulWidget {
   const CreateAccount({super.key});
@@ -20,32 +23,50 @@ class _CreateAccountState extends State<CreateAccount> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  void registerUser() async {
-    if (!_formKey.currentState!.validate()) return;
+void registerUser() async {
+  if (!_formKey.currentState!.validate()) return;
 
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
 
-      await FirebaseFirestore.instance.collection('users').doc(_emailController.text).set({
-        'name': _nameController.text,
-        'email': _emailController.text,
-        'password': _passwordController.text,
-      });
+    // Send email verification
+    await userCredential.user!.sendEmailVerification();
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account created successfully!')));
+    // Save user details to Firestore
+    await FirebaseFirestore.instance.collection('users').doc(_emailController.text).set({
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'password': _passwordController.text,
+      'emailVerified': false,
+    });
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating account: $e')));
-    }
+    // Show a message to the user to check their email for verification
+    Fluttertoast.showToast(
+      msg: "Verification email sent. Please check your email.",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black54,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+
+    // Navigate to OTP verification page
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OTPVerificationPage(
+          email: _emailController.text,
+        ),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating account: $e')));
   }
-
+}
  @override
 Widget build(BuildContext context) {
   return SafeArea(
