@@ -58,7 +58,7 @@ void registerUser() async {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => OTPVerificationPage(
+        builder: (context) => EmailVerificationPage(
           email: _emailController.text,
         ),
       ),

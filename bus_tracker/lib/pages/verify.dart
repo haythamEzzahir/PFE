@@ -5,57 +5,72 @@ import 'package:flutter/material.dart';
 import 'constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class OTPVerificationPage extends StatefulWidget {
+class EmailVerificationPage extends StatefulWidget {
   final String email;
 
-  const OTPVerificationPage({super.key, required this.email});
+  const EmailVerificationPage({super.key, required this.email});
 
   @override
-  _OTPVerificationPageState createState() => _OTPVerificationPageState();
+  _EmailVerificationPageState createState() => _EmailVerificationPageState();
 }
 
-class _OTPVerificationPageState extends State<OTPVerificationPage> {
-  final List<TextEditingController> controllers = List.generate(4, (index) => TextEditingController());
+class _EmailVerificationPageState extends State<EmailVerificationPage> {
   String? errorMessage;
+  bool isEmailSent = false;
 
-  void verifyOTP() async {
+  void sendVerificationEmail() async {
     try {
-      // Combine the OTP digits into a single string
-      String otp = controllers.map((controller) => controller.text).join();
+      User user = FirebaseAuth.instance.currentUser!;
 
-      // For demonstration, we assume the OTP is correct if it's not empty
-      // In a real app, you would validate the OTP with your backend or Firebase
-      if (otp.length == 4) {
-        User user = FirebaseAuth.instance.currentUser!;
+      // Send verification email
+      await user.sendEmailVerification();
 
-        // Reload user to get the latest email verification status
-        await user.reload();
-        user = FirebaseAuth.instance.currentUser!;
+      setState(() {
+        isEmailSent = true;
+        errorMessage = null;
+      });
 
-        if (user.emailVerified) {
-          // Update Firestore to mark email as verified
-          await FirebaseFirestore.instance.collection('users').doc(widget.email).update({
-            'emailVerified': true,
-          });
+      Fluttertoast.showToast(
+        msg: "Verification email sent to ${widget.email}",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } catch (e) {
+      setState(() {
+        errorMessage = "Failed to send verification email: $e";
+      });
+    }
+  }
 
-          // Navigate to login page
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-          );
-        } else {
-          setState(() {
-            errorMessage = "Email not verified. Please check your email and verify.";
-          });
-        }
+  void checkEmailVerification() async {
+    try {
+      User user = FirebaseAuth.instance.currentUser!;
+
+      // Reload user to get the latest email verification status
+      await user.reload();
+      user = FirebaseAuth.instance.currentUser!;
+
+      if (user.emailVerified) {
+        // Update Firestore to mark email as verified
+        await FirebaseFirestore.instance.collection('users').doc(widget.email).update({
+          'emailVerified': true,
+        });
+
+        // Navigate to login page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
       } else {
         setState(() {
-          errorMessage = "Invalid OTP. Please enter a 4-digit code.";
+          errorMessage = "Email not verified. Please check your email and verify.";
         });
       }
     } catch (e) {
       setState(() {
-        errorMessage = "Error verifying OTP: $e";
+        errorMessage = "Error checking email verification: $e";
       });
     }
   }
@@ -92,44 +107,11 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
             textAlign: TextAlign.center,
           ),
           Text(
-            "Please enter the 4-digit code sent to your email.",
+            isEmailSent
+                ? "A verification link has been sent to ${widget.email}. Please check your inbox and click the link to verify your email."
+                : "Click the button below to send a verification link to your email.",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(4, (index) {
-              return SizedBox(
-                width: 60,
-                height: 60,
-                child: TextField(
-                  controller: controllers[index],
-                  textAlign: TextAlign.center,
-                  maxLength: 1,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: "",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.yellow),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[300],
-                  ),
-                  onChanged: (value) {
-                    if (value.isNotEmpty && index < 3) {
-                      FocusScope.of(context).nextFocus();
-                    } else if (value.isEmpty && index > 0) {
-                      FocusScope.of(context).previousFocus();
-                    }
-                  },
-                ),
-              );
-            }),
           ),
           if (errorMessage != null)
             Text(
@@ -141,7 +123,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               ),
             ),
           ElevatedButton(
-            onPressed: verifyOTP,
+            onPressed: checkEmailVerification,
             style: ElevatedButton.styleFrom(
               backgroundColor: yellowColor,
               shape: RoundedRectangleBorder(
@@ -150,11 +132,22 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
             ),
             child: const Text(
-              "CONFIRM",
+              "CHECK VERIFICATION",
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: sendVerificationEmail,
+            child: const Text(
+              "Resend Verification Email",
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
