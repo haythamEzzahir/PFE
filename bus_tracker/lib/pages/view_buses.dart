@@ -37,7 +37,7 @@ class _ViewBusesState extends State<ViewBuses> {
 
     DocumentSnapshot userDoc = await FirebaseFirestore.instance
         .collection('users')
-        .doc(email) // Using email as document ID
+        .doc(email)
         .get();
 
     if (userDoc.exists) {
