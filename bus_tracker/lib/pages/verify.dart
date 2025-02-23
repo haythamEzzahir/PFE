@@ -1,62 +1,76 @@
+import 'package:bus_tracker/pages/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'view_buses.dart';
 import 'constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class EmailVerificationPage extends StatefulWidget {
   final String email;
-  final String verificationId; // Add verificationId
-  const EmailVerificationPage({
-    super.key,
-    required this.email,
-    required this.verificationId,
-  });
+
+  const EmailVerificationPage({super.key, required this.email});
 
   @override
   _EmailVerificationPageState createState() => _EmailVerificationPageState();
 }
 
 class _EmailVerificationPageState extends State<EmailVerificationPage> {
-  final List<TextEditingController> controllers = List.generate(
-    4,
-    (index) => TextEditingController(),
-  );
-
   String? errorMessage;
+  bool isEmailSent = false;
 
-  bool isValidCode() {
-    String code = controllers.map((c) => c.text).join();
-    return code.length == 4 && code.contains(RegExp(r'^\d+$'));
-  }
-
-  Future<void> _verifyCode(BuildContext context) async {
-    String code = controllers.map((c) => c.text).join();
-
-    if (!isValidCode()) {
-      setState(() {
-        errorMessage = "Please enter a valid 4-digit code.";
-      });
-      return;
-    }
-
+  void sendVerificationEmail() async {
     try {
-      // Create a PhoneAuthCredential with the code
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: widget.verificationId,
-        smsCode: code,
-      );
+      User user = FirebaseAuth.instance.currentUser!;
 
-      // Sign in with the credential
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      // Send verification email
+      await user.sendEmailVerification();
 
-      // Navigate to the next page
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) =>  ViewBuses()),
+      setState(() {
+        isEmailSent = true;
+        errorMessage = null;
+      });
+
+      Fluttertoast.showToast(
+        msg: "Verification email sent to ${widget.email}",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
       );
     } catch (e) {
       setState(() {
-        errorMessage = "Invalid verification code.";
+        errorMessage = "Failed to send verification email: $e";
+      });
+    }
+  }
+
+  void checkEmailVerification() async {
+    try {
+      User user = FirebaseAuth.instance.currentUser!;
+
+      // Reload user to get the latest email verification status
+      await user.reload();
+      user = FirebaseAuth.instance.currentUser!;
+
+      if (user.emailVerified) {
+        // Update Firestore to mark email as verified
+        await FirebaseFirestore.instance.collection('users').doc(widget.email).update({
+          'emailVerified': true,
+        });
+
+        // Navigate to login page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } else {
+        setState(() {
+          errorMessage = "Email not verified. Please check your email and verify.";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = "Error checking email verification: $e";
       });
     }
   }
@@ -84,52 +98,20 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
             fit: BoxFit.contain,
           ),
           const Text(
-            "Verify your phone number",
+            "Verify your email",
             style: TextStyle(
-              fontSize: 42,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
+            textAlign: TextAlign.center,
           ),
           Text(
-            "Please enter the 4-digit code sent to your phone number.",
+            isEmailSent
+                ? "A verification link has been sent to ${widget.email}. Please check your inbox and click the link to verify your email."
+                : "Click the button below to send a verification link to your email.",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(4, (index) {
-              return SizedBox(
-                width: 60,
-                height: 60,
-                child: TextField(
-                  controller: controllers[index],
-                  textAlign: TextAlign.center,
-                  maxLength: 1,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: "",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.yellow),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[300],
-                  ),
-                  onChanged: (value) {
-                    if (value.isNotEmpty && index < 3) {
-                      FocusScope.of(context).nextFocus();
-                    } else if (value.isEmpty && index > 0) {
-                      FocusScope.of(context).previousFocus();
-                    }
-                  },
-                ),
-              );
-            }),
           ),
           if (errorMessage != null)
             Text(
@@ -141,7 +123,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               ),
             ),
           ElevatedButton(
-            onPressed: () => _verifyCode(context),
+            onPressed: checkEmailVerification,
             style: ElevatedButton.styleFrom(
               backgroundColor: yellowColor,
               shape: RoundedRectangleBorder(
@@ -150,11 +132,22 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
             ),
             child: const Text(
-              "CONFIRM",
+              "CHECK VERIFICATION",
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: sendVerificationEmail,
+            child: const Text(
+              "Resend Verification Email",
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

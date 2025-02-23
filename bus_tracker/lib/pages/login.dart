@@ -18,42 +18,105 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void signUserIn() async {
-    if (!_formKey.currentState!.validate()) return;
+  // State variables to store error messages
+  String? _emailError;
+  String? _passwordError;
 
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+ void signUserIn() async {
+  if (!_formKey.currentState!.validate()) return;
+
+  // Clear previous error messages
+  setState(() {
+    _emailError = null;
+    _passwordError = null;
+  });
+
+  try {
+    // Sign in with email and password
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    // Check if the email is verified
+    if (userCredential.user!.emailVerified) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login successful!')),
       );
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Login successful!')));
 
       // Navigate to the "view buses" page after successful login
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ViewBuses()), // Replace with your "view buses" page
+        MaterialPageRoute(
+          builder: (context) => const ViewBuses(), // Replace with your "view buses" page
+        ),
       );
-    } on FirebaseAuthException catch (e) {
-      String message = 'An error occurred. Please try again.';
-      
-      if (e.code == 'user-not-found') {
-        message = 'User not found. Please register.';
-      } else if (e.code == 'wrong-password') {
-        message = 'Incorrect password. Please try again.';
-      } else {
-        message = e.message ?? message;
-      }
+    } else {
+      // If email is not verified, show a message and prompt the user to verify their email
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please verify your email before logging in.'),
+        ),
+      );
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
+      // Optionally, send a new verification email
+      await userCredential.user!.sendEmailVerification();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A new verification email has been sent.'),
+        ),
+      );
     }
-  }
+  } on FirebaseAuthException catch (e) {
+    // Map Firebase error codes to custom user-friendly messages
+    String errorMessage;
+    switch (e.code) {
+      case 'user-not-found':
+        errorMessage = 'User not found. Please register.';
+        break;
+      case 'wrong-password':
+        errorMessage = 'Incorrect password. Please try again.';
+        break;
+      case 'too-many-requests':
+        errorMessage = 'Too many attempts. Please try again later.';
+        break;
+      case 'invalid-email':
+        errorMessage = 'Invalid email address. Please check your email.';
+        break;
+      default:
+        // Handle the generic error message
+        if (e.message?.contains("supplied auth credential is incorrect") == true) {
+          errorMessage = 'Incorrect email or password. Please try again.';
+        } else {
+          errorMessage = 'An error occurred. Please try again.'; // Generic fallback message
+        }
+    }
 
+    // Set the appropriate error message
+    if (e.code == 'user-not-found' || e.code == 'invalid-email') {
+      setState(() {
+        _emailError = errorMessage;
+      });
+    } else if (e.code == 'wrong-password' || e.code == 'too-many-requests') {
+      setState(() {
+        _passwordError = errorMessage;
+      });
+    } else {
+      // For generic errors, display the message under the password field
+      setState(() {
+        _passwordError = errorMessage;
+      });
+    }
+  } catch (e) {
+    // Handle any other errors
+    setState(() {
+      _passwordError = 'An unexpected error occurred. Please try again.';
+    });
+  }
+}
   @override
   Widget build(BuildContext context) {
-    var keyboardType = null;
     return SafeArea(
       child: Scaffold(
         appBar: const CustomAppBar(
@@ -71,9 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                     'assets/images/bus.png',
                     height: 80,
                   ),
-
                   const SizedBox(height: 10),
-
                   const Text(
                     "Sign in",
                     style: TextStyle(
@@ -81,40 +142,36 @@ class _LoginPageState extends State<LoginPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   CustomTextField(
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
                     controller: _emailController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Email cannot be empty';
+                        return 'Email is required';
                       }
-                      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                         return 'Enter a valid email';
                       }
                       return null;
                     },
+                    errorText: _emailError, // Pass the email error message
                   ),
-
                   const SizedBox(height: 50),
-
                   CustomTextField(
                     labelText: 'Password',
-                    isPassword: true,
+                    isPassword: true, // Enable password visibility toggle
                     controller: _passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password cannot be empty';
+                        return 'Please enter a password';
                       }
                       return null;
-                    }, keyboardType: keyboardType,
+                    },
+                    errorText: _passwordError,
                   ),
-
                   const SizedBox(height: 20),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: Row(
@@ -137,14 +194,9 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   Mybutton(onTap: signUserIn, text: "Sign in"),
-
                   const SizedBox(height: 50),
-
-                  // Google authentication
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Row(
@@ -168,11 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-
-                  const SizedBox(
-                    height: 30,
-                  ),
-
+                  const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -180,20 +228,14 @@ class _LoginPageState extends State<LoginPage> {
                         imagePath: 'assets/images/google.png',
                         onTap: () => AuthService().signInWithGoogle(),
                       ),
-                      const SizedBox(
-                        width: 20,
-                      ),
+                      const SizedBox(width: 20),
                       squareTile(
                         imagePath: 'assets/images/apple.png',
                         onTap: () => AuthService().signInWithGoogle(),
                       ),
                     ],
                   ),
-
-                  const SizedBox(
-                    height: 30,
-                  ),
-
+                  const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -224,37 +266,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class CustomTextField extends StatelessWidget {
-  final String labelText;
-  final TextInputType keyboardType;
-  final TextEditingController controller;
-  final bool isPassword;
-  final String? Function(String?)? validator;
-
-  const CustomTextField({
-    super.key,
-    required this.labelText,
-    required this.keyboardType,
-    required this.controller,
-    this.isPassword = false,
-    this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        labelText: labelText,
-        border: OutlineInputBorder(),
-      ),
-      validator: validator,
     );
   }
 }
