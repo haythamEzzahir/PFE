@@ -12,6 +12,8 @@ const TextStyle boldTextStyle = TextStyle(
 );
 
 
+
+
 // WIDGETS :
 
 //appBar
@@ -131,39 +133,39 @@ class CustomBottomBar extends StatelessWidget {
 
 
 // button 
- class Mybutton extends StatelessWidget {
- 
- final Function()? onTap;
- final String text;
-  const Mybutton({super.key,required this.onTap,required this.text});
+class Mybutton extends StatelessWidget {
+  final Function()? onTap;
+  final String text;
 
-  
+  const Mybutton({super.key, required this.onTap, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-       onTap: onTap ,
-          child : Container(
-            padding:const EdgeInsets.all(20),
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              color: yellowColor,
-              borderRadius: BorderRadius.circular(8),),
-            child: Center(
-              child: Text(
-                text,
-                style: const TextStyle( 
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-
-              ),
-              ),
-          )
-  );
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Adjusted padding
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          color: yellowColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16, // Adjusted font size
+            ),
+            textAlign: TextAlign.center, // Center-align the text
+            overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+            maxLines: 2, // Allow text to wrap to a second line if needed
+          ),
+        ),
+      ),
+    );
   }
-}
-                   
+}                 
   //squre Tile for google and apple
   class squareTile extends StatelessWidget {
   final String imagePath;
