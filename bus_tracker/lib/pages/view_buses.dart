@@ -1,8 +1,9 @@
+import 'package:bus_tracker/pages/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_tracker/pages/login.dart';
-
+import 'package:share_plus/share_plus.dart';
 class ViewBuses extends StatefulWidget {
   const ViewBuses({super.key});
 
@@ -83,7 +84,13 @@ class _ViewBusesState extends State<ViewBuses> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ProfilePage()),
+                        );
+                      },
                         child: const Text(
                           'View Profile',
                           style: TextStyle(color: Colors.grey, fontSize: 14),
@@ -253,7 +260,12 @@ class _ViewBusesState extends State<ViewBuses> {
                         width: 30,
                         height: 30,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Share.share(
+                          'Check out this awesome bus tracking app!',
+                          subject: 'Bus Tracker App',                          
+                        );
+                      },
                     ),
                   ],
                 ),
