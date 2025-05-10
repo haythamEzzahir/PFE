@@ -55,3 +55,4 @@
    ```bash
    git clone https://github.com/yourusername/CarTrack.git
    cd CarTrack
+   flutter run
