@@ -33,7 +33,7 @@
   - Firebase Storage  
 - **Google Maps API** — Real-time location tracking
 - **Geolocator** — GPS & permissions
-- **Provider / Riverpod** *(if used)* — State Management
+- **Provider / Riverpod** — State Management
 - **Figma / Visily** — UI/UX Design
 
 ---
