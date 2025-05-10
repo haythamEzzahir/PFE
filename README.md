@@ -20,7 +20,7 @@
 
 | Home Page | Active Vehicles | Profile Page |
 |-----------|-----------------|--------------|
-| ![home](assets/screenshots/home.png) | ![map](assets/screenshots/map.png) | ![profile](assets/screenshots/profile.png) |
+| ![home](file:///Users/mourhouc/Desktop/welcome.png) | ![map](assets/screenshots/map.png) | ![profile](assets/screenshots/profile.png) |
 
 ---
 
