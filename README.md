@@ -18,9 +18,9 @@
 
 ## 📸 Screenshots
 
-| Home Page | Active Vehicles | Profile Page |
+| Home Page | Active Vehicles | setting Page |
 |-----------|-----------------|--------------|
-| ![home](https://i.postimg.cc/PqMgHnM6/welcome.png) | ![map](https://i.postimg.cc/Pf7BT4mk/Map.png) | ![profile](assets/screenshots/profile.png) |
+| ![home](https://i.postimg.cc/PqMgHnM6/welcome.png) | ![map](https://i.postimg.cc/Pf7BT4mk/Map.png) | ![setting](https://i.postimg.cc/pLBvWjWY/settings.png) |
 
 ---
 
