@@ -20,7 +20,7 @@
 
 | Home Page | Active Vehicles | Profile Page |
 |-----------|-----------------|--------------|
-| ![home](https://i.postimg.cc/PqMgHnM6/welcome.png) | ![map](assets/screenshots/map.png) | ![profile](assets/screenshots/profile.png) |
+| ![home](https://i.postimg.cc/PqMgHnM6/welcome.png) | ![map](https://i.postimg.cc/Pf7BT4mk/Map.png) | ![profile](assets/screenshots/profile.png) |
 
 ---
 
