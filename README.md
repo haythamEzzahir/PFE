@@ -20,7 +20,7 @@
 
 | Home Page | Active Vehicles | setting Page |
 |-----------|-----------------|--------------|
-| ![home](https://i.postimg.cc/PqMgHnM6/welcome.png) | ![map](https://i.postimg.cc/sfZRBqf2/Map.png) | ![setting](https://i.postimg.cc/pLBvWjWY/settings.png) |
+| ![home](https://i.postimg.cc/PqMgHnM6/welcome.png) | ![map](https://i.postimg.cc/Xq61B2xZ/Map.png) | ![setting](https://i.postimg.cc/pLBvWjWY/settings.png) |
 
 ---
 
