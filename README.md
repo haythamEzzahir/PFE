@@ -20,7 +20,7 @@
 
 | Home Page | Active Vehicles | setting Page |
 |-----------|-----------------|--------------|
-| ![home](https://i.postimg.cc/PqMgHnM6/welcome.png) | ![map](https://i.postimg.cc/Xq61B2xZ/Map.png) | ![setting](https://i.postimg.cc/rsSpjJCz/settings.png) |
+| ![home](https://i.postimg.cc/PqMgHnM6/welcome.png) | ![map](https://camo.githubusercontent.com/56bf552d94d6269e616e14ac9a2af088d0f54b7aee2f4849ab5af869c26b5caf/68747470733a2f2f692e706f7374696d672e63632f6e726a706233674e2f53637265656e2d53686f742d323032352d30372d30362d61742d362d35322d31332d504d2e706e67) | ![setting](https://camo.githubusercontent.com/d5b8fc7773075c8128f13efe25b8fb154f90362841017289ffaf8e0628cbc6fc/68747470733a2f2f692e706f7374696d672e63632f3671764a317947582f53637265656e2d53686f742d323032352d30372d30362d61742d362d35332d33372d504d2e706e67) |
 
 ---
 
