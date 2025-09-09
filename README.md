@@ -40,11 +40,13 @@
 
 ## 🏗️ Architecture
 
-- **Modular Structure**
-  - `/screens/` — Pages like login, home, profile, etc.
-  - `/models/` — Dart classes for Vehicles & Users
-  - `/services/` — Firebase logic (auth, db, location)
-  - `/widgets/` — Reusable UI components
+**Modular Structure**
+  - `/admin/screens/` → Admin-specific screens (e.g., Login, Home, Profile)
+  - `/core/` → Core logic and services (e.g., Authentication, Utilities)
+  - `/driver/` → Driver-specific screens (e.g., Vehicle Info, Driver Home)
+  - `/routes/` → Centralized routing for pages (e.g., /login, /home, /profile)
+  - `/shared/pages/` → Shared screens used by both Admin and Driver modules
+  - `/main` → App entry point and main configuration
 - **Clean Code & Separation of Concerns**
 
 ---
@@ -53,6 +55,7 @@
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/yourusername/CarTrack.git
-   cd CarTrack
+   git clone https://github.com/haythamEzzahir/PFE.git HayMobility
+   cd HayMobility
    flutter run
+
